@@ -27,12 +27,13 @@ namespace Assign_1_Wpf
         
         private BackgroundWorker backgroundWorker;
         bool browseForFile = false;
+        int totalFileSize;
+        static string fileName;
         public MainWindow()
         {
             InitializeComponent();
-
-            //Use background resource that was created
-            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");
+            //Call from XAML window
+            backgroundWorker = (BackgroundWorker)FindResource("backgroundWorker");         
         }
 
         
@@ -46,9 +47,16 @@ namespace Assign_1_Wpf
         private object ShowProgress(int progress, BackgroundWorker worker, DoWorkEventArgs e)
         {
             int result = 0;
-            // i equals the number records/files/lines to read etc...
-            for (int data = 0; data <= progress; data++)
+            FileStream readStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+
+            BinaryReader read = new BinaryReader(readStream);
+            int countRemaining = 0;
+
+            while (read.PeekChar() != -1)
             {
+                progress = Convert.ToInt32(read.ReadByte());
+                countRemaining++;
+
                 if (worker != null)
                 {
                     if (worker.CancellationPending)
@@ -59,18 +67,18 @@ namespace Assign_1_Wpf
 
                     if (worker.WorkerReportsProgress)
                     {
-                        int dataRemaining = progress - data;
-                        int percentComplete = (int)((float)data / (float)progress * 100);
-                        string updateMessage = string.Format("{0} %. Data remaining: {1} data.", percentComplete, dataRemaining);
+                        int dataRemaining = totalFileSize - countRemaining;
+                        int percentComplete = (int)((float)countRemaining / (float)totalFileSize * 100);
+                        string updateMessage = string.Format("{0} %. Data remaining: {1}", percentComplete, dataRemaining);
                         //string updateMessage = string.Format("{0} of {1}", i, progress);
                         worker.ReportProgress(percentComplete, updateMessage);
+                        Thread.Sleep(1);
                     }
+                    result = countRemaining;
                 }
 
-                Thread.Sleep(100);
-                result = data;
             }
-
+            
             return result;
         }
 
@@ -103,17 +111,65 @@ namespace Assign_1_Wpf
             progressBarLines.Value = e.ProgressPercentage;
             outputBox.Text = (string)e.UserState;
         }
-
+        
        
+        private void Add_Numbers_click(object sender, RoutedEventArgs e)
+        {
+            DoAddition();
+        }
 
         //Some work that can be done while the background worker is busy
-        private void AddNumbers(object sender, RoutedEventArgs e)
+        private void DoAddition()
         {
+            Thread.Sleep(100);
             int num1, num2, total;
             num1 = Convert.ToInt32(textBoxNum1.Text);
             num2 = Convert.ToInt32(textBoxNum2.Text);
             total = num1 + num2;
             lblTotal.Content = total.ToString();
+        }
+        
+        //Get a file and set the text box
+        private void BtnGetFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                txtboxFilePath.Text = (openFileDialog.FileName);
+                browseForFile = true;
+                fileName = openFileDialog.FileName;
+            }
+        }
+
+        private void CheckFile()
+        {
+            int bytesToLoad = 0;
+            string filePath = txtboxFilePath.Text;
+
+            if (File.Exists(filePath))
+            {
+                StreamReader streamReader = new StreamReader(filePath);
+                byte[] fileInBytes = new byte[File.ReadAllBytes(filePath).Length];
+                totalFileSize = File.ReadAllBytes(filePath).Length;
+                bytesToLoad = fileInBytes.Length;
+
+                if (bytesToLoad > 0)
+                {
+                    outputBox.Text = bytesToLoad.ToString();
+                }
+                else
+                {
+                    MessageBox.Show("File is empty");
+                    return;
+                }
+            }
+            else
+            { 
+                MessageBox.Show("No such file");
+                return;
+            }
+            
         }
 
         private void BtnStartLoading_Click(object sender, RoutedEventArgs e)
@@ -121,7 +177,7 @@ namespace Assign_1_Wpf
             if (browseForFile)
             {
                 int iterations;
-                ProcessFile();
+                CheckFile();
                 bool success = Int32.TryParse(outputBox.Text, out iterations);
                 if (success)
                 {
@@ -134,43 +190,11 @@ namespace Assign_1_Wpf
                     }
 
                 }
-                btnStart.IsEnabled = false;
-                btnStop.IsEnabled = true;
             }
             else
                 MessageBox.Show("First select a file");
-        }
 
-        private void ProcessFile()
-        {
-            int lines = 0;
-            int bytesToLoad = 0;
-            string filePath = txtboxFilePath.Text;
-            if (File.Exists(filePath))
-            {
-                StreamReader streamReader = new StreamReader(filePath);
-                string[] fileData = new string[File.ReadAllLines(filePath).Length];
-                byte[] fileInBytes = new byte[File.ReadAllBytes(filePath).Length];
-                bytesToLoad = fileInBytes.Length;
-                lines = fileData.Length;
-                if (lines > 0)
-                {
-                    outputBox.Text = lines.ToString();
-                    outputBoxBytes.Text = bytesToLoad.ToString();
-                }
-                else
-                {
-                    MessageBox.Show("File is empty");
-                    return;
-                }
-                
-            }
-            else
-            {
-                MessageBox.Show("No such file");
-                return;
-            }
-            
+
         }
 
         private void BtnStop_Click_1(object sender, RoutedEventArgs e)
@@ -181,16 +205,6 @@ namespace Assign_1_Wpf
 
         }
 
-        private void BtnGetFile_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            
-            if (openFileDialog.ShowDialog() == true)
-            {
-                txtboxFilePath.Text = (openFileDialog.FileName);
-                browseForFile = true;
-            }
-        }
 
         private void BtnExit_Click(object sender, RoutedEventArgs e)
         {
