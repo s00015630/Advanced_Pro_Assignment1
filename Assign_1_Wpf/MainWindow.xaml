@@ -1,0 +1,43 @@
+﻿<Window x:Class="Assign_1_Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"      
+        xmlns:cm="clr-namespace:System.ComponentModel;assembly=System"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Window.Resources>
+        <cm:BackgroundWorker x:Key="backgroundWorker" 
+            DoWork="BackgroundWorker_DoWork"
+            WorkerReportsProgress="True"                 
+            ProgressChanged="BackgroundWorker_ProgressChanged"
+            RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+            WorkerSupportsCancellation="True"/>
+    </Window.Resources>
+
+    <Grid x:Name="btnTotal">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="134*"/>
+            <RowDefinition Height="285*"/>
+        </Grid.RowDefinitions>
+        <ProgressBar x:Name="progressBarLines" HorizontalAlignment="Left" Height="27" Margin="95,82,0,0" VerticalAlignment="Top" Width="380" Grid.Row="1" />
+        <Button x:Name="btnStart" Content="Load" HorizontalAlignment="Left" Margin="95,155.286,0,0" VerticalAlignment="Top" Width="75" Click="BtnStartLoading_Click" Grid.Row="1"/>
+        <Button x:Name="btnStop" Content="Stop" HorizontalAlignment="Left" Margin="95,209.286,0,0" VerticalAlignment="Top" Width="75" Click="BtnStop_Click_1" Grid.Row="1"/>
+        <TextBox x:Name="textBoxNum1" HorizontalAlignment="Left" Height="23" Margin="250,209.286,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
+        <TextBox x:Name="textBoxNum2" HorizontalAlignment="Left" Height="23" Margin="390,209.286,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66" Grid.Row="1"/>
+        <Label Content="+" HorizontalAlignment="Left" Margin="344,199.286,0,0" VerticalAlignment="Top" FontSize="22" Grid.Row="1"/>
+        <Label x:Name="lblTotal" Content="" HorizontalAlignment="Left" Margin="575,209.286,0,0" VerticalAlignment="Top" Width="90" Height="23" Grid.Row="1"/>
+        <Button Content="=" HorizontalAlignment="Left" Margin="482,209.286,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="AddNumbers" Grid.Row="1"/>
+        <TextBox x:Name="outputBox" HorizontalAlignment="Left" Height="27" Margin="529,82,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" FontSize="14" IsEnabled="False" Grid.Row="1"/>
+        <Button x:Name="btnGetFile" Content="Find File" HorizontalAlignment="Left" Margin="95,47,0,0" VerticalAlignment="Top" Width="75" Click="BtnGetFile_Click" Height="23"/>
+        <TextBox x:Name="txtboxFilePath" HorizontalAlignment="Left" Height="23" Margin="196,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="567"/>
+        <Label Content="Do some math while waiting for file to load" HorizontalAlignment="Left" Height="31" Margin="244,163.286,0,0" VerticalAlignment="Top" Width="347" FontWeight="Bold" FontSize="16" Grid.Row="1"/>
+        <Button x:Name="btnExit" Content="Close" HorizontalAlignment="Left" Margin="688,209.286,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="BtnExit_Click" Grid.Row="1"/>
+        <TextBox x:Name="outputBoxBytes" HorizontalAlignment="Left" Height="27" Margin="529,128,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="234" FontSize="14" IsEnabled="False" Grid.RowSpan="2"/>
+        <ProgressBar x:Name="progressBarBytes" HorizontalAlignment="Left" Height="27" Margin="95,128,0,0" VerticalAlignment="Top" Width="380" Grid.RowSpan="2" />
+        <Label Content="Bytes in file" HorizontalAlignment="Left" Margin="95,102,0,0" VerticalAlignment="Top"/>
+        <Label Content="Lines in file" HorizontalAlignment="Left" Margin="95,53,0,0" VerticalAlignment="Top" Grid.Row="1"/>
+
+    </Grid>
+</Window>
